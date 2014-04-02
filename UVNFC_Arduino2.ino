@@ -142,7 +142,7 @@ void loop(void) {
                       
                       //STOP MEASUREMENTS 
                       /*Dont need to reset count or ee_add here since
-                       doing it when 'Starting' with a phone write*/`
+                       doing it when 'Starting' with a phone write*/
             }
             flags = 0;
             into_fired = 0; //we have serviced INT1
@@ -164,6 +164,10 @@ void loop(void) {
           if (timer_f==1){
             timer_f=0;
             NFCount++;
+            
+            StoreData(ee_address, NFCount);
+            UpdateEepromHeader();
+            
             /*
             //uvRaw = analogRead(A0);
             StoreData(ee_address, NFCount );
@@ -182,7 +186,7 @@ void loop(void) {
             /*int z;        ///RELIC
             for (z=65; z<89; z++){
               StoreData(ee_address, (z+NFCount));
-            }*/
+            }
             
             int z;
             storedcount=0;
@@ -191,13 +195,13 @@ void loop(void) {
             }  
             UpdateEepromHeader();
             
+            
+            ee_address = 0x0A; 
+            */
             int i;
             for (i=0; i<10; i++){
                payload[i]=EepromRead(i);
-            }
-            ee_address = 0x0A; 
-            
-                    
+            }        
             ReadAllData();
             PAY_LEN=sizeof(payload);                    //find the length of the payload
        
