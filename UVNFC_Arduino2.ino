@@ -55,51 +55,40 @@ unsigned static int PAY_LEN;
 void setup(void) 
 {
     
-    delay(1000);     //_MH addition
-  
-    //Serial.begin(115200);  ///tbr
-    //Serial.println("Serial connection initiated");    //tbr
-    //Serial.println("NDEF message creation");  //tbr
-    Wire.begin();            //FROM _MH UVNFC_EEPROM
+    delay(1000);                             //Helps for some reason...
+    
+    Wire.begin();                            //Start i2c
     delay(150);
-    //pinMode(led, OUTPUT);   //tbr
-    //digitalWrite(led, HIGH);  //tbr
-     //Pin setup
-    pinMode(A0, INPUT);
-    pinMode(A1, INPUT);
+   
+    pinMode(A0, INPUT);                      //Set up UV pin
+    pinMode(A1, INPUT);                      //Set up ambient pin
   
-    //reset RF430    //tbr
-    nfc.begin();
-
+    nfc.begin();                             //start/reset the RF430 NFC board
     
-    //_MH change from delay(1000);
-    delay(1000);
+    delay(1000);                             //Helps for some reason...
     
-     /***TIMER INTERRUPTS***/
-  //stop interrupts 
-  cli();
-  //set timer1 interrupt at 0.25Hz
-  TCCR1A = 0;    //set entire TCCR1A register to 0
-  TCCR1B = 0;    //same for TCCR1B
-  TCNT1  = 0;    //initialize counter value to 0
-  //set compare match register for 0.25hz increments
-  OCR1A = 46874; // = (8*10^6) / (1024*(1/6s) - 1 (must be <65536)
-  //turn on CTC mode
-  TCCR1B |= (1 << WGM12);
-  //Set CS10 and CS12 bits for 1024 prescaler
-  TCCR1B |= (1 << CS12) | (1 << CS10);  
-  //enable timer compare interrupt
-  TIMSK1 |= (1 << OCIE1A);
-  //allow interrupts
-  sei();
+    
+    /*********TIMER INTERRUPTS*********/
+    
+    cli();                                   //stop interrupts         
   
-  //FOR TEST _MH
-  pinMode(2, OUTPUT); 
-
+  
+    TCCR1A = 0;                              //set entire TCCR1A register to 0
+    TCCR1B = 0;                              //same for TCCR1B
+    TCNT1  = 0;                              //initialize counter value to 0
+    OCR1A = 46874;                           // = (8*10^6) / (1024*(1/6s) - 1 (must be <65536)
+    TCCR1B |= (1 << WGM12);                  //turn on CTC mode
+    TCCR1B |= (1 << CS12) | (1 << CS10);     //Set CS10 and CS12 bits for 1024 prescaler
+    TIMSK1 |= (1 << OCIE1A);                 //enable timer compare interrupt
+    sei();                                   //allow interrupts
+  
     
 }
 
-//timer interrupt subroutine 
+/******************************END OF SETUP**********************************************/
+
+/*TIMER INTERRUPT SERVICE ROUTINE*/
+
 ISR(TIMER1_COMPA_vect){
      count++;
             
@@ -111,52 +100,17 @@ ISR(TIMER1_COMPA_vect){
          }
      }
 }
-/******************************SHOWARRAY******************************/
-/*
-void showarray (byte arr[], int length){
-  int x;
-  for (x=0; x<=length; x++){
-    Serial.print(arr[x],HEX);Serial.print(",");
-    //if x is divisible by ten print a new line
-    if ((x+1)%10==0){
-      Serial.println("");
-    }
-    delay(100);
-  }
-  Serial.println("\nEND\n");
-  delay(3000);
-} 
 
-void showASCII (byte arr[], int length){
-  int y;
-  char z;
-  for (y=0; y<=length; y++){
-    if (arr[y] <=64){
-      z=46;
-    }
-    else{
-      
-    z=arr[y];
-    }
-    Serial.print(z);
-  }
-}
 
-  
-*/
-/******************************MAIN*********************************/
 
+/************************************MAIN***************************************/
 
 
 void loop(void) {
-    
-
-    
-    
-///_MH    Serial.println("Wait for read or write...");
+      
     while(1)
     {
-        if(into_fired)
+        if(into_fired)              //if there is a hardware (NFC) interrupt
         {
           
             
@@ -166,21 +120,23 @@ void loop(void) {
             
             //read the flag register to check if a read or write occurred
             flags = nfc.Read_Register(INT_FLAG_REG); 
-///_MH            Serial.print("INT_FLAG_REG = 0x");Serial.println(flags, HEX);
             
             //ACK the flags to clear
             nfc.Write_Register(INT_FLAG_REG, EOW_INT_FLAG + EOR_INT_FLAG); 
             
-            if(flags & EOW_INT_FLAG)      //check if the tag was written
-            {
-///_MH                Serial.println("The tag was writted!");
-///_MH                digitalWrite(led, HIGH);
+            
+            /********************IF DEVICE WRITTEN TO************************/
+            if(flags & EOW_INT_FLAG){
+
+              //Get EERPOM HEADER FROM PHONE, RESET POINTER, SETUP TIMER + START. Check AAR
+              
             }
-            else if(flags & EOR_INT_FLAG) //check if the tag was read
+            
+            /********************IF DEVICE READ FROM************************/
+            else if(flags & EOR_INT_FLAG)
             {
-///_MH                Serial.println("The tag was readed!");
-///_MH                digitalWrite(led, LOW);
                       //RESET EEPROM POINTER
+                      //STOP MEASUREMENTS 
             }
             flags = 0;
             into_fired = 0; //we have serviced INT1
@@ -240,7 +196,7 @@ void loop(void) {
     
    
     while(!(nfc.Read_Register(STATUS_REG) & READY)); //wait until READY bit has been set
-///_MH    Serial.print("Fireware Version:"); Serial.println(nfc.Read_Register(VERSION_REG), HEX);    
+  
 
     //write NDEF memory with Capability Container + NDEF message
     nfc.Write_Continuous(0, NDEF_MSG, (sizeof(NDEF_MSG)+1));
@@ -253,7 +209,6 @@ void loop(void) {
 
     //enable interrupt 1
     attachInterrupt(1, RF430_Interrupt, FALLING);
-        ////
         
         }
     }
