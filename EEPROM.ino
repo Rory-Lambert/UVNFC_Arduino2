@@ -108,15 +108,15 @@ void ReadAllData(){
   /*READ storedcount NUMBER OF VALUES FROM EEPROM
     AND STORE SEQUENTIALLY IN A BUFFER*/
   
-  int address = 0x00;        //start at first address
+  int address = 0x0A;        //start at first address
   int y = 0;
-  for (y=0; y<(countEE+10); y++){
+  for (y=0; y<(countEE); y++){
     
     receivedValue = EepromRead(address);    //read hi data value
     address++;                                 //increment eeprom address
     
     //convert to int and store in buffer
-    payload[y] = receivedValue;
+    payload[y+10] = receivedValue;
     
   }
   

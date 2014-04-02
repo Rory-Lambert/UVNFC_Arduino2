@@ -141,6 +141,8 @@ void loop(void) {
             {
                       
                       //STOP MEASUREMENTS 
+                      /*Dont need to reset count or ee_add here since
+                       doing it when 'Starting' with a phone write*/`
             }
             flags = 0;
             into_fired = 0; //we have serviced INT1
@@ -167,8 +169,13 @@ void loop(void) {
             StoreData(ee_address, NFCount );
             //ambRaw = analogRead(A1);
             StoreData(ee_address, (NFCount+30));
-            //uvEE = EepromRead(0x03);
-            //ambEE = EepromRead(0x04);
+            
+            
+            
+            //Get data from adc
+            //store data in eeprom
+            //UpdateEepromHeader();      //update header
+            
             */
             }          
           
@@ -177,13 +184,20 @@ void loop(void) {
               StoreData(ee_address, (z+NFCount));
             }*/
             
+            int z;
+            storedcount=0;
+            for (z=48; z<57; z++){
+              StoreData(ee_address, z);
+            }  
             UpdateEepromHeader();
             
             int i;
             for (i=0; i<10; i++){
-               StoreData(ee_address, (i+65));
+               payload[i]=EepromRead(i);
             }
-            ee_address = 0x0A;           
+            ee_address = 0x0A; 
+            
+                    
             ReadAllData();
             PAY_LEN=sizeof(payload);                    //find the length of the payload
        
