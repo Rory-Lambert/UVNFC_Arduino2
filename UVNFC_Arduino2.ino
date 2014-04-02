@@ -128,14 +128,18 @@ void loop(void) {
             /********************IF DEVICE WRITTEN TO************************/
             if(flags & EOW_INT_FLAG){
 
-              //Get EERPOM HEADER FROM PHONE, RESET POINTER, SETUP TIMER + START. Check AAR
+              //Get EERPOM HEADER FROM PHONE, RESET POINTER, SETUP TIMER + START. Check 
+              
+                /*Reset before START*/
+                storedcount = 0;        //reset global storedcount
+                ee_address = 0x0A;      //reset global eeprom address
               
             }
             
             /********************IF DEVICE READ FROM************************/
             else if(flags & EOR_INT_FLAG)
             {
-                      //RESET EEPROM POINTER
+                      
                       //STOP MEASUREMENTS 
             }
             flags = 0;
@@ -168,14 +172,18 @@ void loop(void) {
             */
             }          
           
-            int z;
+            /*int z;        ///RELIC
             for (z=65; z<89; z++){
               StoreData(ee_address, (z+NFCount));
+            }*/
+            
+            UpdateEepromHeader();
+            
+            int i;
+            for (i=0; i<10; i++){
+               StoreData(ee_address, (i+65));
             }
-            
-            
-            //payload[0] = count;
-            //payload[1]=NFCount;
+            ee_address = 0x0A;           
             ReadAllData();
             PAY_LEN=sizeof(payload);                    //find the length of the payload
        

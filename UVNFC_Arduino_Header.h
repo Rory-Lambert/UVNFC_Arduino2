@@ -158,7 +158,7 @@ const static int LEN_BYTE_PAY = 0x1E;    //payload length
 
 //removed EEPROM addresses _MH should know what needs to go in here
 
-byte Device_ID_LSB = 1;     //Allows for 255 devices (Default :1)
+byte Device_ID = 1;     //Allows for 255 devices (Default :1)
 byte Year = 14;             //1 byte allows for 255 years. 0 = year 2000
 byte Day_MSB = 0;           //xxxxxxBB  10 bits allow for 512 days > 365
 byte Day_LSB = 183;          //Day 183 is July 3 (testing)
@@ -167,13 +167,13 @@ byte Time_Min =59;          //Time in minutes
 byte Interval = 1;          //Measurement Interval (1 to 255 mins)
 byte Total_1  = 0;          //(Memory pointer) (byte 1)
 byte Total_2  = 0;			//_MH says these values are stored in EEPROM
-byte Total_3  = 1;
+byte Total_3  = 0;
 
 /************************************EEPROM DEFINES*************************/
 #define uvPin A0          // The physical addresses of the pins connected to UV sensor... A0
 #define ambPin A1          //...and ambient light sensor A1
 
-int ee_address = 0x02;     //initial eeprom address
+int ee_address = 0x0A;     //initial eeprom address
 
 //address format: 1 0 1 0 A2 A1 B0 R/W. (R/W = 1 for read, 0 for write)
 int eeprom_cntrl = 0x50;  //A2 = 0; A1 = 0; B0 = 0.

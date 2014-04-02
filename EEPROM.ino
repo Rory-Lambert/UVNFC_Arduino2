@@ -99,19 +99,18 @@ void UpdateCounter(){
 void ReadAllData(){
   /* function for reading all of eeprom */
   byte receivedValue = 0;
-  byte receivedBuffer[1024];
   
   //get count bytes from eeprom and convert to integer
-  byte count_hi = EepromRead(0x00);
-  byte count_lo = EepromRead(0x01);
+  byte count_hi = EepromRead(0x08);
+  byte count_lo = EepromRead(0x09);
   int countEE = count_lo | (count_hi << 8);
   
   /*READ storedcount NUMBER OF VALUES FROM EEPROM
     AND STORE SEQUENTIALLY IN A BUFFER*/
   
-  int address = 0x03;        //start at first address
+  int address = 0x00;        //start at first address
   int y = 0;
-  for (y=0; y<countEE; y++){
+  for (y=0; y<(countEE+10); y++){
     
     receivedValue = EepromRead(address);    //read hi data value
     address++;                                 //increment eeprom address
@@ -120,8 +119,32 @@ void ReadAllData(){
     payload[y] = receivedValue;
     
   }
-
-  storedcount = 0;        //reset global storedcount
-  ee_address = 0x02;      //reset global eeprom address
   
 }
+
+/******************************SETUP EEPROM HEADER***************************/
+
+
+void UpdateEepromHeader (void){
+  
+  /*Take global storedcount (integer) and cast as 3 bytes*/
+  Total_3 = storedcount;
+  Total_2 = (storedcount >> 8);
+  Total_1 = 0x00;
+  
+  
+  EepromWrite(0x00, Device_ID);          
+  EepromWrite(0x01,Year);
+  EepromWrite(0x02,Day_MSB);
+  EepromWrite(0x03,Day_LSB);
+  EepromWrite(0x04,Time_Hr);
+  EepromWrite(0x05,Time_Min);
+  EepromWrite(0x06,Interval);
+  EepromWrite(0x07,Total_1);
+  EepromWrite(0x08,Total_2);
+  EepromWrite(0x09,Total_3);
+  
+}
+  
+  
+
