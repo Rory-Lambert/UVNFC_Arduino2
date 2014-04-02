@@ -1,5 +1,6 @@
 /*Attempt at encapsulating the message preparation process into a stand-alone function*/
 
+
 void NDEF_prep (byte arr[], int Nlen){
   
   int p =0;

@@ -133,6 +133,9 @@ void loop(void) {
                 /*Reset before START*/
                 storedcount = 0;        //reset global storedcount
                 ee_address = 0x0A;      //reset global eeprom address
+                
+                /*START*/
+                //sei();                                   //allow interrupts
               
             }
             
@@ -141,6 +144,7 @@ void loop(void) {
             {
                       
                       //STOP MEASUREMENTS 
+                      //cli();             //stop interrupts         
                       /*Dont need to reset count or ee_add here since
                        doing it when 'Starting' with a phone write*/
             }
@@ -165,8 +169,10 @@ void loop(void) {
             timer_f=0;
             NFCount++;
             
-            StoreData(ee_address, NFCount);
+            StoreData(ee_address, NFCount+30);
             UpdateEepromHeader();
+            ReadAllData();
+
             
             /*
             //uvRaw = analogRead(A0);
@@ -198,11 +204,9 @@ void loop(void) {
             
             ee_address = 0x0A; 
             */
-            int i;
-            for (i=0; i<10; i++){
-               payload[i]=EepromRead(i);
-            }        
-            ReadAllData();
+                  
+              
+            
             PAY_LEN=sizeof(payload);                    //find the length of the payload
        
             /*sets the length of the NDEF message, depending upon the payload size*/
@@ -211,7 +215,6 @@ void loop(void) {
             
             //Function call prepares the full NDEF message
             NDEF_prep(NDEF_MSG, PAY_LEN);    
-
     
       
       

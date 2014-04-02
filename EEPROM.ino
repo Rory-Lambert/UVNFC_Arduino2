@@ -127,6 +127,8 @@ void ReadAllData(){
 
 void UpdateEepromHeader (void){
   
+  int i;
+  
   /*Take global storedcount (integer) and cast as 3 bytes*/
   Total_3 = storedcount;
   Total_2 = (storedcount >> 8);
@@ -144,6 +146,10 @@ void UpdateEepromHeader (void){
   EepromWrite(0x08,Total_2);
   EepromWrite(0x09,Total_3);
   
+  
+  for (i=0; i<10; i++){    
+    payload[i]=EepromRead(i);
+  }
 }
   
   
