@@ -43,6 +43,19 @@ void NDEF_prep (byte arr[], int Nlen){
 ///_MH    showarray(arr, p);
 ///_MH    showASCII(arr, p);
 }
+
+void getourdata(){
+  
+  int x;
+  
+  /*Read the whole message from NFC */
+  nfc.Read_Continuous(0, fromPhone, packet_len);
+  
+  /*Grab the 10 bytes we are interested in (our header)*/
+  for (x=startpos; x<(startpos+data_header_len); x++){
+    data_header[x-startpos] = fromPhone[x];
+ }}
+  
   
 
 

@@ -180,5 +180,11 @@ int eeprom_cntrl = 0x50;  //A2 = 0; A1 = 0; B0 = 0.
 /******TODO: WILL NEED TO IMPLEMENT THIS FOR TWO BLOCKS******/
 
 
+/**********************GRABOURDATA*******************/
+
+int packet_len = 99;
+int data_header_len = 10;
+int startpos = 58;
+
 #endif /* RLMSG2_H */
 

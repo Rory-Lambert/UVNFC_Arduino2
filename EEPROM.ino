@@ -125,8 +125,13 @@ void ReadAllData(){
 /******************************SETUP EEPROM HEADER***************************/
 
 
-void UpdateEepromHeader (void){
+void UpdateEepromHeader (){
   
+  
+  
+ 
+  
+
   int i, meascount;
   
   /*Take global storedcount (integer), half it to make a measurement number
