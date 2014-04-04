@@ -73,7 +73,7 @@ void StoreData(int address, int data){
   storedcount++;                    //increment global storedcount
   
   //update counter value stored in eeprom
-  UpdateCounter();
+  //UpdateCounter();  REMOVED 4th APRIL!!! Update count now occurs in update EEPROM header!
 }
 
 
@@ -88,9 +88,9 @@ void UpdateCounter(){
   byte count_lo = storedcount;
   byte count_hi = (storedcount >> 8);
   
-  //Update Counter Value in eeprom addresses 0x00 and 0x01
-  EepromWrite(0x00, count_hi);    //tx count_hi byte
-  EepromWrite(0x01, count_lo);    //tx count_lo byte
+  //Update Counter Value in eeprom addresses 0x00 and 0x01 //now 8 and 9!!!!!
+  EepromWrite(0x08, count_hi);    //tx count_hi byte
+  EepromWrite(0x09, count_lo);    //tx count_lo byte
 
 }
 
@@ -127,12 +127,16 @@ void ReadAllData(){
 
 void UpdateEepromHeader (void){
   
-  int i;
+  int i, meascount;
   
-  /*Take global storedcount (integer) and cast as 3 bytes*/
-  Total_3 = storedcount;
-  Total_2 = (storedcount >> 8);
-  Total_1 = 0x00;
+  /*Take global storedcount (integer), half it to make a measurement number
+   and cast as 3 bytes*/
+  meascount = (storedcount/2);
+  
+  
+  Total_3 = meascount;
+  Total_2 = (meascount >> 8);
+  Total_1 = 0x00;   
   
   
   EepromWrite(0x00, Device_ID);          

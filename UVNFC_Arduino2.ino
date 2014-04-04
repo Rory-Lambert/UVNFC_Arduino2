@@ -33,7 +33,7 @@ uint16_t flags = 0;
 byte msg_setup[] = MSG_SETUP;  //31b
 byte mime_type[] = MIME_TYPE;  //27b
 byte aar[] = AAR; //33b
-byte payload[25]; //= PAYLOAD;
+byte payload[50]; //= PAYLOAD;
 byte payload2[] = PAYLOAD2;
 byte header[11];
 
@@ -168,8 +168,10 @@ void loop(void) {
           if (timer_f==1){
             timer_f=0;
             NFCount++;
-            
-            StoreData(ee_address, NFCount+30);
+            ambRaw = analogRead(A1);
+            StoreData(ee_address, NFCount);
+            delay(100);
+            StoreData(ee_address, NFCount+ 16);
             UpdateEepromHeader();
             ReadAllData();
 
