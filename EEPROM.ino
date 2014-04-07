@@ -143,7 +143,7 @@ void UpdateEepromHeader (){
   Total_2 = (meascount >> 8);
   Total_1 = 0x00;   
   
-  
+  /*
   EepromWrite(0x00, Device_ID);          
   EepromWrite(0x01,Year);
   EepromWrite(0x02,Day_MSB);
@@ -154,7 +154,7 @@ void UpdateEepromHeader (){
   EepromWrite(0x07,Total_1);
   EepromWrite(0x08,Total_2);
   EepromWrite(0x09,Total_3);
-  
+  */
   
   for (i=0; i<10; i++){    
     payload[i]=EepromRead(i);

@@ -36,8 +36,8 @@ byte aar[] = AAR; //33b
 byte payload[50]; //= PAYLOAD;
 byte payload2[] = PAYLOAD2;
 byte header[11];
-byte fromPhone[200];
-byte data_header[10];
+//byte fromPhone[0x61];
+//byte data_header[7];
 
 //_MH's variables - Global
 int timer_f = 0;
@@ -134,11 +134,11 @@ void loop(void) {
               
                 /*Reset before START*/
                 //getourdata();
-                nfc.Read_Continuous(0, fromPhone, packet_len);
-                int q; 
-                for (q=0; q<100; q++){
-                   StoreData(ee_address, fromPhone[q]);
-                }
+                Data_From_Phone();
+
+                UpdateEepromHeader();
+                  
+                
                 /*int c;
                 for (c=0; c<7; c++){
                 StoreData(ee_address, data_header[c]);
@@ -195,12 +195,12 @@ void loop(void) {
             timer_f=0;
             NFCount++;
             //ambRaw = analogRead(A1);
-            StoreData(ee_address, NFCount);
+            //StoreData(ee_address, NFCount);
             delay(100);
             //StoreData(ee_address, NFCount+ 16);
             
-            UpdateEepromHeader();
-            ReadAllData();
+            //UpdateEepromHeader();
+            //ReadAllData();
 
             
             /*
@@ -280,5 +280,31 @@ void RF430_Interrupt(){
     detachInterrupt(1);//cancel interrupt
 }
 
+
+void Store_Header (byte arr[], int length){
+  int x;
+  for(x=0; x<=length; x++){
+    StoreData(x, arr[x]);
+  }
+  for(x=length+1; x<=length+3; x++){
+     StoreData(x, 0);
+  }
+  ee_address=10;
+  storedcount=0;
+}
+
+
+
+void Data_From_Phone(){
+  byte from_phone[100];
+  int x;
+  nfc.Read_Continuous(0, from_phone, 99);
+  byte data[7]= {0,0,0,0,0,0,0};
+
+  for (x=58; x<65; x++){
+    data[x-58]=from_phone[x];
+  }
+  Store_Header(data, sizeof(data)-1);  
+}
 
 
