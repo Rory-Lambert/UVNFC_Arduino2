@@ -33,7 +33,7 @@ uint16_t flags = 0;
 byte msg_setup[] = MSG_SETUP;  //31b
 byte mime_type[] = MIME_TYPE;  //27b
 byte aar[] = AAR; //33b
-byte payload[50]; //= PAYLOAD;
+byte payload[63]; //= PAYLOAD;
 byte payload2[] = PAYLOAD2;
 byte header[11];
 //byte fromPhone[0x61];
@@ -48,6 +48,7 @@ byte ambEE = 0;
 int storedcount = 0;
 
 int NFCount = 0; //***dev
+boolean WRITTEN_TO;
 
 static int count = 0; //***dev
 
@@ -133,29 +134,8 @@ void loop(void) {
               //Get EERPOM HEADER FROM PHONE, RESET POINTER, SETUP TIMER + START. Check 
               
                 /*Reset before START*/
-                //getourdata();
-                Data_From_Phone();
-
-                UpdateEepromHeader();
-                  
-                
-                /*int c;
-                for (c=0; c<7; c++){
-                StoreData(ee_address, data_header[c]);
-                */
-                  
-                /*Device_ID = data_header[0];
-                Year = data_header[1];
-                Day_MSB = data_header[2];
-                Day_LSB = data_header[3];
-                Time_Hr  = data_header[4];
-                Time_Min = data_header[5];
-                Interval = data_header[6];
-                Total_1 = data_header[7];
-                Total_2 = data_header[8];
-                Total_3 = data_header[9];*/
-                //UpdateEepromHeader();
-                
+                WRITTEN_TO=true;
+         
                  
                 //storedcount = 0;        //reset global storedcount
                 //ee_address = 0x0A;      //reset global eeprom address
@@ -194,47 +174,45 @@ void loop(void) {
           if (timer_f==1){
             timer_f=0;
             NFCount++;
-            //ambRaw = analogRead(A1);
-            //StoreData(ee_address, NFCount);
             delay(100);
-            //StoreData(ee_address, NFCount+ 16);
-            
-            //UpdateEepromHeader();
-            //ReadAllData();
-
-            
-            /*
-            //uvRaw = analogRead(A0);
-            StoreData(ee_address, NFCount );
-            //ambRaw = analogRead(A1);
-            StoreData(ee_address, (NFCount+30));
-            
-            
-            
-            //Get data from adc
-            //store data in eeprom
-            //UpdateEepromHeader();      //update header
-            
-            */
+  
             }          
           
-            /*int z;        ///RELIC
-            for (z=65; z<89; z++){
-              StoreData(ee_address, (z+NFCount));
-            }
             
-            int z;
-            storedcount=0;
-            for (z=48; z<57; z++){
-              StoreData(ee_address, z);
-            }  
-            UpdateEepromHeader();
+          if (WRITTEN_TO==true){
+            byte from_phone2[200];
             
+            //clear control reg to disable RF
+            nfc.Write_Register(CONTROL_REG, INT_ENABLE + INTO_DRIVE); 
+            delay(750);
+
+            //read the flag register to check if a read or write occurred 
+            flags = nfc.Read_Register(INT_FLAG_REG); 
+
+            //ACK the flags to clear
+            nfc.Write_Register(INT_FLAG_REG, EOW_INT_FLAG + EOR_INT_FLAG); 
+
+            nfc.Read_Continuous(0, payload, 99);
             
-            ee_address = 0x0A; 
-            */
-                  
-              
+            flags = 0;
+            into_fired = 0; //we have serviced INT1
+
+            //Enable interrupts for End of Read and End of Write
+            nfc.Write_Register(INT_ENABLE_REG, EOW_INT_ENABLE + EOR_INT_ENABLE);
+
+            //Configure INTO pin for active low and re-enable RF
+            nfc.Write_Register(CONTROL_REG, INT_ENABLE + INTO_DRIVE + RF_ENABLE);
+
+            //re-enable INTO
+            attachInterrupt(1, RF430_Interrupt, FALLING);
+            int y;
+            /*for (y=0; y<(49); y++){
+              payload[y]=from_phone2[y];
+            }*/
+            payload[0] = 0xAA;
+            WRITTEN_TO=false;
+          }
+       
             
             PAY_LEN=sizeof(payload);                    //find the length of the payload
        
